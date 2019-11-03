@@ -10,6 +10,7 @@ import org.openqa.selenium.Keys;
 
 import java.time.LocalDate;
 
+import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Condition.exactText;
 import static com.codeborne.selenide.Selenide.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,6 +20,7 @@ class CardDeliveryTest {
     private LocalDate correctDate = LocalDate.now().plusDays(minDaysToCorrectDate);
     private LocalDate unCorrectDate = LocalDate.now();
     private String locatorCity = "[data-test-id=city]";
+    private String locatorCityMenu = ".menu-item__control";
     private String locatorDate = "[data-test-id=date]";
     private String locatorName = "[data-test-id=name]";
     private String locatorPhone = "[data-test-id=phone]";
@@ -109,6 +111,23 @@ class CardDeliveryTest {
         $(locatorPhone + " input").setValue("+79270000000");
         $$(By.className("button")).find(exactText("Забронировать")).click();
         $(locatorAgreement).shouldHave(Condition.cssClass("input_invalid"));
+    }
+    @Test
+    @DisplayName(value = "Should successfully for correct values and using menu with mouth ")
+    void shouldSuccessWithCorrectValuesWithMouth() {
+        String choiceDay = String.valueOf(LocalDate.now().getDayOfMonth()+7);
+        $(locatorCity + " input").setValue("Кра");
+        $$(locatorCityMenu).findBy(Condition.exactText("Краснодар")).click();
+        $("button .icon_name_calendar").click();
+        $(".calendar__layout").waitUntil(Condition.visible, 2000);
+        $$(".calendar__day").find(attribute("textContent",choiceDay)).click();
+        $(locatorName + " input").setValue("Иванов Василий");
+        $(locatorPhone + " input").setValue("+79270000000");
+        $(locatorAgreement).click();
+        $$(By.className("button")).find(exactText("Забронировать")).click();
+        SelenideElement notification = $(locatorNotification);
+        notification.waitUntil(Condition.visible, 15000);
+        notification.$(locatorNotificationTitle).should(Condition.exactText("Успешно!"));
     }
 
     // возвращает дату в текстовом формате для подстановки в поле
