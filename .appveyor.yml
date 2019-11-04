@@ -1,4 +1,4 @@
-image: Ubuntu1804  # образ для сборки
+image: Visual Studio 2015  # образ для сборки
 
 branches:
   only:
